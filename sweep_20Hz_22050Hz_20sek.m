@@ -1,6 +1,6 @@
 bitdepth = 16;
 sampleRate = 44100;
-startfreqency = 10;
+startfreqency = 20;
 endfreqency = sampleRate / 2;
 lenghtInSek = 20;
 
@@ -16,6 +16,6 @@ wave = sin(timeRange * pi * 2  .* frequencePerSampleRange );
 
 plot(wave)
 sound(wave,sampleRate*2, bitdepth)
-waveTitle = strcat(num2str(lenghtInSek),"sec_", num2str(startfreqency),"Hz_", num2str(endfreqency),  'Hz_sweep.wav')
+waveTitle = strcat('sweep_', num2str(startfreqency),"Hz_", num2str(endfreqency),'Hz_', num2str(lenghtInSek), 'sec.wav')
 wavwrite(wave, sampleRate, bitdepth, waveTitle )
 
