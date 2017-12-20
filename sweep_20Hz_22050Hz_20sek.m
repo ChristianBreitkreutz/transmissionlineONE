@@ -3,25 +3,34 @@ bitdepth = 16;
 sampleRate = 44100;
 startfreqency = 20;
 endfreqency = sampleRate / 2;
-lenghtInSek = 10;
+lenghtInSek = 4;
 figure(1, "position",get(0,"screensize") / 2) # maxi window plot output
-amountOfSamples = sampleRate * lenghtInSek
-stepSize = 1 / sampleRate;
-allOverFrequency = (endfreqency - startfreqency);
-frequencePerSample = (allOverFrequency) / amountOfSamples;
-xRange = 1:amountOfSamples;
+
+amountOfSamples = sampleRate * lenghtInSek;
+xRangeInSamples = 1:amountOfSamples;
+
+exponent = 3;
+logagithmicXRange = (xRangeInSamples .** exponent);
+maximalfrequencyePerSample = (amountOfSamples ** exponent);
+normalizedLogagithmicXRange = logagithmicXRange ./ maximalfrequencyePerSample;
+frequencyePerSampleRange =  normalizedLogagithmicXRange * endfreqency;
 
 subplot(2,2,1);
-frequencePerSampleRange = (xRange .** 3) ./ (amountOfSamples ** 3) * endfreqency;
+plot(frequencyePerSampleRange);
+title("frequency per sample");
+xlabel('samples')
+ylabel('frequency (Hz)')
 
-plot(frequencePerSampleRange);
+normalizedTimeRange = xRangeInSamples ./ amountOfSamples ;
+timeRange = normalizedTimeRange ;#.* (lenghtInSek / 4) ;
 
-normalizedTimeRange = (xRange ./ amountOfSamples) ;
-timeRange = normalizedTimeRange * lenghtInSek / 4 ;
+
+wave = sin(timeRange .* pi .* 2  .* 1000 );#.* frequencyePerSampleRange );
 subplot(2,2,2);
-plot(timeRange);
-
-wave = sin(timeRange * pi * 2  .* frequencePerSampleRange );
+semilogx( abs(fft2(wave)));
+title("Spectrum");
+xlabel('Hz')
+ylabel('dB')
 
 subplot(2,2,[3 4]);
 plot(wave)
