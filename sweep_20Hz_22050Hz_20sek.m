@@ -1,9 +1,9 @@
 # author: christianbreitkreutz@gmx.de
 bitdepth = 16;
 sampleRate = 44100;
-startfreqency = 20;
+startfreqency = 1;
 endfreqency = sampleRate / 2;
-lenghtInSek = 4;
+lenghtInSek = 20;
 figure(1, "position",get(0,"screensize") / 2) # maxi window plot output
 
 amountOfSamples = sampleRate * lenghtInSek;
@@ -13,7 +13,7 @@ exponent = 3;
 logagithmicXRange = (xRangeInSamples .** exponent);
 maximalfrequencyePerSample = (amountOfSamples ** exponent);
 normalizedLogagithmicXRange = logagithmicXRange ./ maximalfrequencyePerSample;
-frequencyePerSampleRange =  normalizedLogagithmicXRange * endfreqency;
+frequencyePerSampleRange =  normalizedLogagithmicXRange * (endfreqency-startfreqency);
 
 subplot(2,2,1);
 plot(frequencyePerSampleRange);
@@ -22,23 +22,28 @@ xlabel('samples')
 ylabel('frequency (Hz)')
 
 normalizedTimeRange = xRangeInSamples ./ amountOfSamples ;
-timeRange = normalizedTimeRange ;#.* (lenghtInSek / 4) ;
+timeRange = normalizedTimeRange * lenghtInSek; 
 
-
-wave = sin(timeRange .* pi .* 2  .* 1000 );#.* frequencyePerSampleRange );
+sampleBasedWave = sin(timeRange  .* 2  .* frequencyePerSampleRange );
+timeBaseWave = sin(normalizedTimeRange  .* 2  .* frequencyePerSampleRange);
+subplot(2,2,3);
+plot(timeBaseWave);
+title("timeBaseWave");
 subplot(2,2,2);
-semilogx( abs(fft2(wave)));
+
+semilogx( abs(fft2(timeBaseWave)));
 title("Spectrum");
 xlabel('Hz')
 ylabel('dB')
+axis ([startfreqency endfreqency],"on")
 
-subplot(2,2,[3 4]);
-plot(wave)
+subplot(2,2,[ 4]);
+plot(sampleBasedWave)
 title("sinus sweep");
 xlabel('samples')
 ylabel('amplitude')
 
-sound(wave, sampleRate , bitdepth)
+sound(sampleBasedWave, sampleRate, bitdepth)
 
 waveTitle = strcat(
     'sinussweep','_',
@@ -46,5 +51,5 @@ waveTitle = strcat(
     num2str(endfreqency),'Hz','_IN_',
     num2str(lenghtInSek), 'sec',
     '.wav')
-wavwrite(wave, sampleRate, bitdepth, waveTitle )
+wavwrite(sampleBasedWave, sampleRate, bitdepth, waveTitle )
 
