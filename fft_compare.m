@@ -10,52 +10,58 @@ endfunction
 function printMagnitude (magOut, amountSamples)
   sampleRate = 44100;
   f = calcFrequencyRange(sampleRate, amountSamples);
-  length(f)
-  length(magOut)
   semilogx( f, magOut);
   xlabel('Hz')
   ylabel('dB')
+endfunction
+
+function printDoubleMagnitude (magOut1, magOut2,amountSamples1, amountSamples2)
+  sampleRate = 44100;
+  f1 = calcFrequencyRange(sampleRate, amountSamples1);
+  f2 = calcFrequencyRange(sampleRate, amountSamples2);
+  semilogx( f1, magOut1, f2, magOut2);
+  xlabel('Hz')
+  ylabel('dB')
+  
 endfunction
 
 function calculateMagnitudeResult = calculateMagnitude (data)
   calculateMagnitudeResult = abs(fftshift(fft(data)));
 endfunction
 
+function result = myResize(vector, newLength)
+ out = 1:newLength;
+ for i = 1:newLength
+  out(i) = vector(i);
+ endfor
+ result = out;
+endfunction
 
 #############################################################################
 #############################################################################
 #############################################################################
 fileName_dry = "sweeps/sinussweep_2Hz_22050hz_15sec.wav";
-fileName_wet = "sweeps/17_12_22_TransmissionOne - 0002.wav";
-
+fileName_wet = "sweeps/17_12_22_TransmissionOne - 0000.wav";
 
 [data_dry, sampleRate_dry, bitDepth_dry] = wavread(fileName_dry);
 [data_wet, sampleRate_wet, bitDepth_wet] = wavread(fileName_wet);
 magnitude_dry = calculateMagnitude(data_dry);
 magnitude_wet = calculateMagnitude(data_wet);
 
-subplot(3,2,1);
-printMagnitude(magnitude_dry , length(data_dry));
-title("dry");
-axis ([20 sampleRate_dry/2 0 6000],"on");
-
-subplot(3,2,2);
-printMagnitude(magnitude_wet , length(data_wet));
-title("wet");
-axis ([20 sampleRate_wet/2 0 6000],"on");
-
+########################################################################
+subplot(3,2,[1 2]);
+fft_resoluton = length(magnitude_wet);
+maxiValue = max(magnitude_wet);
+resized_wet = myResize(magnitude_wet, fft_resoluton);
+printMagnitude( resized_wet ./ maxiValue, fft_resoluton);
+title("wet - normalized");
+axis ([20 sampleRate_dry/2],"on");
 
 
-normalized_wet = 0:length(magnitude_dry );
-for i=1:length(magnitude_dry), normalized_wet(i) = magnitude_wet(i) / magnitude_dry(i); end
-
-length(magnitude_dry)
 subplot(3,2,[3 4]);
-printMagnitude(normalized_wet , 661501);
-title("normlized wet");
-axis ([20 sampleRate_wet/2 0 4],"on");
-
-subplot(3,2,[5 6]);
-printMagnitude(normalized_wet , 661501);
-title("normlized wet");
-axis ([20 sampleRate_dry/2 0 0.5],"on");
+fft_resoluton = length(magnitude_dry);
+temp = myResize(magnitude_wet, fft_resoluton);
+temp2 = myResize(magnitude_dry, fft_resoluton);
+printMagnitude(temp ./ temp2, fft_resoluton);
+title("wet - pre-bla");
+axis ([20 sampleRate_wet/2],"on");
