@@ -8,7 +8,7 @@ function result = calcFrequencyRange (sampleRate, amountSamples)
 endfunction
 
 function printMagnitude (magOut, amountSamples)
-  sampleRate = 44100;
+  sampleRate = 44100 ;
   f = calcFrequencyRange(sampleRate, amountSamples);
   semilogx( f, magOut);
   xlabel('Hz')
@@ -30,9 +30,12 @@ function calculateMagnitudeResult = calculateMagnitude (data)
 endfunction
 
 function result = myResize(vector, newLength)
+ originalLength = length(vector);
+ incrementFactor = int32(originalLength/newLength) + 1;
  out = 1:newLength;
- for i = 1:newLength
-  out(i) = vector(i);
+ outputCounter = 1;
+ for i = 1:incrementFactor:originalLength-1
+  out(outputCounter++) = vector(i);
  endfor
  result = out;
 endfunction
@@ -48,20 +51,32 @@ fileName_wet = "sweeps/17_12_22_TransmissionOne - 0000.wav";
 magnitude_dry = calculateMagnitude(data_dry);
 magnitude_wet = calculateMagnitude(data_wet);
 
+fft_resoluton = 2^11
 ########################################################################
-subplot(3,2,[1 2]);
-fft_resoluton = length(magnitude_wet);
-maxiValue = max(magnitude_wet);
-resized_wet = myResize(magnitude_wet, fft_resoluton);
-printMagnitude( resized_wet ./ maxiValue, fft_resoluton);
-title("wet - normalized");
-axis ([20 sampleRate_dry/2],"on");
 
+
+subplot(3,2,[1 2]);
+
+resized_wet = myResize(magnitude_wet, fft_resoluton);
+maxiValue = max(magnitude_wet);
+normalized_wet = resized_wet ./ maxiValue;
+printMagnitude(normalized_wet , fft_resoluton);
+title("wet signal- normalized");
+axis ([20 (sampleRate_dry/2) 0 1],"on");
 
 subplot(3,2,[3 4]);
-fft_resoluton = length(magnitude_dry);
-temp = myResize(magnitude_wet, fft_resoluton);
-temp2 = myResize(magnitude_dry, fft_resoluton);
-printMagnitude(temp ./ temp2, fft_resoluton);
-title("wet - pre-bla");
-axis ([20 sampleRate_wet/2],"on");
+resized_dry = myResize(magnitude_dry, fft_resoluton);
+maxiValue = max(resized_dry);
+normalized_dry = resized_dry ./ maxiValue;
+printMagnitude( normalized_dry , fft_resoluton);
+title("dry signal - normalized");
+axis ([20 (sampleRate_dry/2) 0 1],"on");
+ 
+subplot(3,2,[5 6]);
+predistorted = resized_wet ./ resized_dry;
+maxiValue = max(predistorted) ;
+normalized_predistorted = vorentzertes ./ maxiValue;
+printMagnitude(normalized_predistorted, fft_resoluton);
+title("wet signal - predistorted");
+axis ([20 (sampleRate_wet/2) 0 1],"on");
+
