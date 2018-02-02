@@ -1,4 +1,4 @@
-figure(1, "position",get(0, "screensize") / 2) # maxi window plot output
+figure(1, "position",get(0, "screensize") ) # maxi window plot output
 0;
 function result = calcFrequencyRange (sampleRate, amountSamples)
   delta_f = sampleRate/amountSamples;
@@ -75,7 +75,7 @@ axis ([20 (sampleRate_dry/2) 0 1],"on");
 subplot(3,2,[5 6]);
 predistorted = resized_wet ./ resized_dry;
 maxiValue = max(predistorted) ;
-normalized_predistorted = vorentzertes ./ maxiValue;
+normalized_predistorted = predistorted ./ maxiValue;
 printMagnitude(normalized_predistorted, fft_resoluton);
 title("wet signal - predistorted");
 axis ([20 (sampleRate_wet/2) 0 1],"on");
